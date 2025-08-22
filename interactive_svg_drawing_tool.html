@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG Pencil Drawing Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        svg {
+            border: 2px solid #333;
+            width: 800px;
+            height: 500px;
+            cursor: crosshair;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>SVG Pencil Drawing Tool</h2>
+    <p>Click and drag inside the SVG area to draw freehand with the pencil.</p>
+
+    <!-- SVG Canvas -->
+    <svg id="drawingCanvas"></svg>
+
+    <script>
+        const svg = document.getElementById('drawingCanvas');
+        let isDrawing = false;
+        let path;
+
+        // Convert mouse position to SVG coordinates
+        function getMousePosition(evt) {
+            const rect = svg.getBoundingClientRect();
+            return {
+                x: evt.clientX - rect.left,
+                y: evt.clientY - rect.top
+            };
+        }
+
+        // Mouse down – start a new path
+        svg.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            const { x, y } = getMousePosition(e);
+
+            path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            path.setAttribute("stroke", "black");
+            path.setAttribute("stroke-width", "2");
+            path.setAttribute("fill", "none");
+            path.setAttribute("d", `M ${x} ${y}`); // Move to starting point
+
+            svg.appendChild(path);
+        });
+
+        // Mouse move – extend the path
+        svg.addEventListener('mousemove', (e) => {
+            if (!isDrawing) return;
+
+            const { x, y } = getMousePosition(e);
+            const d = path.getAttribute("d");
+            path.setAttribute("d", `${d} L ${x} ${y}`); // Draw line to new point
+        });
+
+        // Mouse up – stop drawing
+        svg.addEventListener('mouseup', () => {
+            isDrawing = false;
+        });
+
+        // Mouse leave – stop drawing if leaving SVG
+        svg.addEventListener('mouseleave', () => {
+            isDrawing = false;
+        });
+    </script>
+
+</body>
+</html>
